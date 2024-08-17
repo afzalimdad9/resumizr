@@ -11,5 +11,4 @@ def validate_password(strategy, user, is_new=False, *args, **kwargs):
         user.set_password(password)
         user.save()
     elif not user.check_password(password):
-    	print 'not matched'
         raise exceptions.AuthException(strategy.backend)

@@ -32,5 +32,4 @@ def writepdf(request):
         return HttpResponse(request.body,mimetype='application/json')
         
     else:
-        print 'data'
         return render(request, 'landing_page/index.html', {})

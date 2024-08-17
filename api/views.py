@@ -70,8 +70,7 @@ def signup(request, backend, *args, **kwargs):
 
     
         else :
-            print 'got error !!!'
-            print form.errors.keys()
+            print(form.errors.keys())
 
     else:
 
@@ -328,7 +327,6 @@ def get_resume_data(request, resumeId):
     try :
         return HttpResponse(json.dumps(request.user.resumizr_data.resume_data['resume'][resumeId]),mimetype='application/json')
     except :
-        print 'loha'
         return HttpResponse(json.dumps({'ERROR':'No such resumse data found'}),mimetype='application/json')
 
 
