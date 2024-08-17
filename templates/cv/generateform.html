@@ -1,0 +1,447 @@
+{% include "cv/header.html" with title="Resumizr- Manual CV Generation" %}
+<body>
+<!-- ajax progress bar -->
+<div class="progress-bar"></div>
+<button type="button" class="btn btn-lg btn-primary refresh" id="refresh">Refresh Genius</button>
+<header>
+    <nav class="navbar navbar-default" role="navigation" style="background:#333;">
+   <div class="navbar-header">
+      <a class="navbar-brand" href="#" style="color:#fff;font-weight:bold;font-size:20px;margin-left:20%;">Resumizr</a>
+   </div>
+   <div>
+      <p class="navbar-text" style="color:#fff;font-weight:bold;font-size:16px;margin-left:30%;">Signed in as <span style="color:#5ac9fc;font-style:italic;">{{user}}</span></p>
+      <span class="pull-right" style="margin-right:-10%;">
+      	<a href="/user/dashboard" class="flat-button fill-orange" style="margin-top:8px;">Dashboard</a>
+      	<a href="../../../logout" class="flat-button fill-red" style="margin-top:8px;">Logout</a>
+   	  </span>
+   </div>
+</nav>
+</header>
+<div class="belowbar pull-right">
+	<button id="save" class="flat-button fill-green save--form">Save Form</button>
+	<input type="submit" value="Export PDF" class="flat-button fill-darkblue cv-write" />
+	<button type="submit" id="preview" class="flat-button fill-lightblue">Preview</button>
+</div>
+	<br/>
+	<div class="container" style="width:99.8%;">
+
+		<!-- Modal -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		  <div class="modal-dialog">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        <h4 class="modal-title" id="myModalLabel">Change Section Title</h4>
+		      </div>
+		      <div class="modal-body">
+		        <input type="text" class="form-control prompt-section-title" placeholder="Change Section's Title"/>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+		        <button type="button" class="btn btn-primary save-section-title">Save changes</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Preview Modal -->
+		<div class="modal fade" id="myModalPreview" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="">
+		  <div class="modal-dialog" style="width:80%;overflow:auto;">
+		    <div class="modal-content">
+		      <div class="modal-header" style="height:620px;overflow:auto;">
+		        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        <h4 class="modal-title" id="myModalLabel" style="text-align:center;">CV Preview</h4>
+		        <hr>
+		        <div class="preview-generated-cv"></div>
+		      </div>
+
+		    </div>
+		  </div>
+		</div>
+
+		<!-- PDF Option Modal -->
+		<div class="modal fade" id="pdfOptions" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="">
+		  <div class="modal-dialog" style="width:20%;margin-top:200px;overflow:auto;">
+		    <div class="modal-content">
+		      <div class="modal-header" style="height:200px;overflow:auto;">
+		        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		        <h4 class="modal-title" id="myModalLabel" style="text-align:center;background:#eee;">Resume Formats: </h4>
+		        <hr>
+		        <div class="provide-pdf-options" style="margin-left:30px;">
+		        	 
+				    <input type="radio" name="pdf-options" id="option1" value="Professional" checked="checked"> Professional
+				    <br/>
+				    <input type="radio" name="pdf-options" id="option2" value="Chronological"> Chronological
+				    <br/>
+				    <input type="radio" name="pdf-options" id="option3" value="Basic"> Basic
+				    <br/><input type="radio" name="pdf-options" id="option4" value="Interactive"> Interactive
+				    <br/>
+		        </div>
+		      </div>
+		      	<div class="modal-footer" >
+					<button class="btn btn-success selected-pdf-option" >Generate</button>
+					<button class="btn btn-danger cancel-pdf-option"  data-dismiss="modal">Cancel</button>
+				</div>
+
+		    </div>
+		  </div>
+		</div>
+
+		<div class="row">
+		  <div class="col-md-3" >
+		  	<ul id="sortable">
+		  	   <section class="field-card"><li class="sortable-tab--field" href="#1" data-toggle="tab"><i style="color:gray" class="fa fa-user"></i> Basic Information</li></section>
+			   <section class="field-card"><li class="sortable-tab--field" href="#2" data-toggle="tab"><i style="color:gray" class="fa fa-quote-left"></i> Career Objective</li></section>
+			   <section class="field-card"><li class="sortable-tab--field" href="#3" data-toggle="tab"><i style="color:gray" class="fa fa-suitcase"></i> Work Experience</li></section>
+			   <section class="field-card"><li class="sortable-tab--field" href="#4" data-toggle="tab"><i style="color:gray" class="fa fa-book"></i> Education</li></section>
+			   <section class="field-card"><li class="sortable-tab--field" href="#5" data-toggle="tab"><i style="color:gray" class="fa fa-check-square-o"></i> Projects</li></section>
+			   <section class="field-card"><li class="sortable-tab--field" href="#6" data-toggle="tab"><i style="color:gray" class="fa fa-star"></i> Skills</li></section>
+			   <section class="field-card"><li class="sortable-tab--field" href="#7" data-toggle="tab"><i style="color:gray" class="fa fa-certificate"></i> Achievements</li></section>
+			</ul>
+			<button class="flat-button fill-gray btn-lg add--section" style="margin-left:10px;width:240px;">Create a new Section</button>
+		  </div>
+
+		  <div class="col-md-9 cv-form-fill" style="width:70%;height:500px; margin-left:20px;overflow:auto;">
+
+		  	<div class="tab-content">
+				<div class="tab-pane active" id="1">
+				<div class="tab-header">
+					<label class="label--text heading">Basic Information</label>
+				</div>
+					<span style="margin-left: 20px; color:#9accea">
+					</span>
+
+					<div class="cv-basic-information">
+					<div class="row">
+
+						<div class="col-md-6">
+						<div class="card ">
+							<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+							<label class="label--text sub-heading">Full Name</label>
+
+						    <input type="text" data-key="name" class="form-control mod-text-box" placeholder="Eg: Varun Malhotra" id="name" name="cv__fullname"/>
+
+						</div>
+						</div>
+
+						<div class="col-md-6">
+							<div class="card">
+							<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+							<label class="label--text sub-heading">Email Address</label>
+
+							<input type="email" data-key="email" class="form-control mod-text-box" placeholder="Eg: valid.mail@gmail.com" name="cv__email" id="email"/>
+
+							</div>
+						</div>
+					</div>
+
+					<br/>
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="card">
+							<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+							<label class="label--text sub-heading">Phone Number</label>
+						    <input type="text" data-key="phone" class="form-control mod-text-box" id="phone" placeholder="Eg: (+91) 99XXXXXX89" name="cv__contact"/>
+						    </div>
+						</div>
+						<div class="col-md-6">
+
+							<div class="card">
+							<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+							<label class="label--text sub-heading">Website</label>
+							<input type="email" data-key="website" class="form-control mod-text-box" placeholder="Eg: http://yourname.info" name="cv__website" id="website"/>
+							</div>
+
+
+						</div>
+					</div>
+
+					<br />
+
+					<div class="row">
+						<div class="col-md-6">
+							<div class="card">
+							<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+							<label class="label--text sub-heading ">Address</label>
+							<input type="text" data-key="location" class="form-control mod-text-box" placeholder="Eg: A-1, Park Street, India" name="cv__address" id="location"/>
+						    </div>
+						</div>
+					</div>
+					</div>
+					<br />
+
+				</div>
+				<div class="tab-pane" id="2">
+					<label class="label--text heading">Career Objective</label>
+					<span style="margin-left: 20px; color:#9accea">
+						<a><i class="fa fa-pencil fa-2x" data-toggle="modal" data-target="#myModal" title="Edit"></i>&nbsp;</a>
+					</span>
+					<div class="cv-careerobj">
+						<div class="card">
+						<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+							<label class="label--text sub-heading">What you admire?</label>
+							<textarea class="form-control mod-text-box career-objective" rows="3" name="cv__careerobj"></textarea>
+						</div>
+					</div>
+					<br/>
+					<hr/>
+				</div>
+				<div class="tab-pane" id="3">
+					<label class="label--text heading">Work Experience</label>
+					<span style="margin-left: 20px; color:#9accea">
+						<a><i class="fa fa-pencil fa-2x" data-toggle="modal" data-target="#myModal" title="Edit"></i>&nbsp;</a>
+					</span>
+					<hr/>
+					<div class="cv-work-experience">
+						<i style="color:#c0392b; margin-right:5px; float:right;" class="fa fa-times fa-2x parent--delete" title="Remove this WorkEx Entry"></i>
+						<label class="sub-section-heading">Fill out the Details</label>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Job Title</label>
+							    <input type="text" data-key="job_title" class="form-control mod-text-box job-title" placeholder="Eg: Frontend Designer" name="cv__jobtitle"/>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Comapny Name</label>
+								<input type="email" data-key="company_name" class="form-control mod-text-box company-name" placeholder="Eg: Resumizr" name="cv__companyname"/>
+								</div>
+							</div>
+						</div>
+						<br/>
+						<div class="row">
+							<div class="col-md-6">
+							<div class="card">
+							<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Start Date</label>
+							    <input type="text" data-key="start_date" class="form-control mod-text-box start-date" placeholder="Eg: 14th May, 20xx" name="cv__companystart"/>
+							</div>
+							</div>
+							<div class="col-md-6">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">End date</label>
+								<input type="email" data-key="end_date" class="form-control mod-text-box end-date" placeholder="Eg: 2nd July, 20xx" name="cv__companyend"/>
+								</div>
+							</div>
+						</div>
+						<br/>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card">
+								<label class="label--text sub-heading">Description</label>
+								<textarea class="form-control mod-text-box job-description" rows="3" name="cv__companydesc"></textarea>
+								</div>
+							</div>
+						</div>
+						<br/>
+					</div>
+					<button class="btn btn-primary add-new-job">Add Entry</button>
+				</div>
+				<div class="tab-pane" id="4">
+					<label class="label--text heading">Education</label>
+					<span style="margin-left: 20px; color:#9accea">
+						<a><i class="fa fa-pencil fa-2x" data-toggle="modal" data-target="#myModal" title="Edit"></i>&nbsp;</a>
+					</span>
+					<hr/>
+					<div class="cv-education">
+						<i style="color:#c0392b; margin-right:5px; float:right;" class="fa fa-times fa-2x parent--delete" title="Remove this Educational Entry"></i>
+						<label class="sub-section-heading">Fill out the Details</label>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Type</label>
+							    <input type="text" data-key="education_type" class="form-control mod-text-box education-type" placeholder="Eg: B.Tech" name="cv__coursename"/>
+							    </div>
+
+							</div>
+							<div class="col-md-6">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Institution Name</label>
+								<input type="email" data-key="institution_name" class="form-control mod-text-box institution-name" placeholder="Eg: JIIT" name="cv__instiname"/>
+								</div>
+							</div>
+						</div>
+						<br/>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Period</label>
+							    <input type="text" data-key="education_period" class="form-control mod-text-box education-period" placeholder="Eg: 19XX - 20xx" name="cv__eduperiod"/>
+							    </div>
+							</div>
+						</div>
+						<br/>
+						<div class="row">
+							<div class="col-md-12">
+							<div class="card">
+							<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Description</label>
+								<textarea class="form-control mod-text-box education-description" rows="2" name="cv__instidescription"></textarea>
+							</div>
+							</div>
+						</div>
+						<br/>
+					</div>
+					<button class="btn btn-primary add-new-education">Add Entry</button>
+				</div>
+
+				<div class="tab-pane" id="5">
+					<label class="label--text heading">Projects</label>
+					<span style="margin-left: 20px; color:#9accea">
+						<a><i class="fa fa-pencil fa-2x" data-toggle="modal" data-target="#myModal" title="Edit"></i>&nbsp;</a>
+					</span>
+					<hr/>
+					<div class="cv-projects">
+						<i style="color:#c0392b; margin-right:5px; float:right;" class="fa fa-times fa-2x parent--delete" title="Remove this Project Entry"></i>
+						
+						<label class="sub-section-heading">Fill out the Details</label>
+						<div class="row">
+							<div class="col-md-6">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Project Title</label>
+							    <input type="text" data-key="project_title" class="form-control mod-text-box project-title" placeholder="Button Maker" name="cv__projecttitle"/>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Project URL</label>
+								<input type="email" data-key="project_url" class="form-control mod-text-box project-url" placeholder="http://github.com/someone/something" name="cv__projecturl"/>
+								</div>
+							</div>
+						</div>
+						<br/>
+						<div class="row">
+							<div class="col-md-6">
+							<div class="card">
+							<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Start Date</label>
+							    <input type="text" data-key="project_start_date" class="form-control mod-text-box project-start-date" placeholder="Eg: 14th May, 20xx" name="cv__projectstart"/>
+							</div>
+							</div>
+							<div class="col-md-6">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">End date</label>
+								<input type="email" data-key="project_end_date" class="form-control mod-text-box project-end-date" placeholder="Eg: 2nd July, 20xx" name="cv__projectend"/>
+								</div>
+							</div>
+						</div>
+						<br/>
+						<div class="row">
+							<div class="col-md-12">
+								<div class="card">
+								<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+								<label class="label--text sub-heading">Description</label>
+								<textarea class="form-control mod-text-box project-description" rows="3" name="cv__projectdesc"></textarea>
+								</div>
+							</div>
+						</div>
+						<br/>
+					</div>
+				<button class="btn btn-primary add-new-project">Add Entry</button>
+				</div>
+
+				<div class="tab-pane" id="6">
+					<label class="label--text heading">Skills</label>
+					<span style="margin-left: 20px; color:#9accea">
+						<a><i class="fa fa-pencil fa-2x" data-toggle="modal" data-target="#myModal" title="Edit"></i>&nbsp;</a>
+					</span>
+					<div class="alert alert-warning alert-dismissable" style="display:none;">
+					  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					  <strong>Warning!</strong> You have created maximum of 10 Skill Sets. Please delete or reuse already created tags to continue.
+					</div>
+					<div class="skill-errors">
+					<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+					</div>
+					
+					<hr/>
+					<div class="cv-skill-set">
+
+						<div class="card">
+						<a><i style="color:#c0392b; margin-right:5px; float:right;" class="fa fa-times fa-2x skill-tag" title="Remove this Skill Set"></i></a>
+						<label class="sub-section-heading">Fill out the Details</label>
+						<hr/>
+							<div class="row">
+								<div class="col-md-3">
+									<label class="sub-section-heading">Skill Type:</label>
+									<input type="text" class="form-control skill-type" name="cv__skill_type" placeholder="Eg: Languages"/>
+								</div>
+								<div class="col-md-9">	
+									<label class="sub-section-heading">Add Skills:</label>
+									<br/>
+									<input type="text" data-role="tagsinput" class="form-control skill-tags tagInputs typeahead" name="cv__skill_tags"/>	
+								
+								</div>
+							</div>
+						</div>
+					</div>
+					<button class="btn btn-primary add-new-skill-set">Add New Skill Set</button>
+					
+				</div>
+
+				<div class="tab-pane" id="7">
+					<label class="label--text heading">Achievements</label>
+					<span style="margin-left: 20px; color:#9accea">
+						<a><i class="fa fa-pencil fa-2x" data-toggle="modal" data-target="#myModal" title="Edit"></i>&nbsp;</a>
+					</span>
+					<div class="cv-achievement">
+						<div class="card">
+						<div class="status"><i style="font-size:18px" class=" status-icon fa"></i></div>
+							<label class="label--text sub-heading">Description</label>
+							<textarea class="form-control mod-text-box achievements" rows="3" name="cv__achievement"></textarea>
+						</div>
+					</div>
+					<br/>
+					<hr/>
+				</div>
+	        </div>
+		  </div>
+		</div>
+
+		</form>
+		<br/>
+		
+      
+	
+		<!-- <br/ >
+		<h2>Start Creating Now</h2>
+
+		<br />
+			<div class="ui fluid form segment" ng-controller="SubmitFormField">
+			<form class="form-horizontal" id="createForm" action = "/generate/cvform/" ng-submit="checkField()" method="post">
+			{% csrf_token %}
+			<br />
+				  <div class="form-group">
+				    <label for="heading" class="col-sm-1 control-label">Heading</label>
+				    <div class="col-sm-10">
+				    	<input type="text" class="form-control" name="heading" placeholder="Enter Heading">
+				    </div>
+				  </div>
+				  <div class="form-group">
+				    <label for="content" class="col-sm-1 control-label">Content</label>
+				    <div class="col-sm-10">
+				    	<textarea class="form-control" name="content" placeholder="Enter Content"></textarea>
+				    </div>
+				  </div>
+
+			  <input type="submit" value="Submit" class="btn btn-success submit-form" />
+		</form>
+			</div>
+
+		{{headingStatus}}
+		{{contentStatus}} -->
+
+
+
+	</body>
+</html>
